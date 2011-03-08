@@ -39,7 +39,7 @@ import subprocess
 import sys
 
 version_info = (0, 1)
-__version__ = '.'.join(version_info)
+__version__ = '.'.join(map(str, version_info))
 
 
 def _dirmatch(path, matchwith):
