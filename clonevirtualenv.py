@@ -15,7 +15,7 @@ It performs the following:
 
 - copies sys.argv[1] dir to sys.argv[2]
 - updates the hardcoded VIRTUAL_ENV variable in the activate script to the
-  new repo location.
+  new repo location. (--relocatable doesn't touch this)
 - updates the shebangs of the various scripts in bin to the new python if
   they pointed to the old python. (version numbering is retained.)
 
@@ -40,6 +40,9 @@ import sys
 
 version_info = (0, 1, 1)
 __version__ = '.'.join(map(str, version_info))
+
+
+logger = logging.getLogger()
 
 
 def _dirmatch(path, matchwith):
@@ -132,7 +135,7 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
         return
 
     def rewrite_shebang(version=None):
-        print 'fixing', filename
+        logger.debug('fixing %s' % filename)
         shebang = new_shebang
         if version:
             shebang = shebang + version
@@ -160,7 +163,7 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
 
 
 def fixup_activate(filename, old_dir, new_dir):
-    print 'fixing', filename
+    logger.debug('fixing %s' % filename)
     f = open(filename, 'rb')
     data = f.read()
     f.close()
@@ -171,7 +174,7 @@ def fixup_activate(filename, old_dir, new_dir):
 
 
 def fixup_link(filename, old_dir, new_dir, target=None):
-    print 'fixing', filename
+    logger.debug('fixing %s' % filename)
     if target is None:
         target = os.readlink(filename)
     raise NotImplementedError()
@@ -198,7 +201,7 @@ def fixup_syspath_items(syspath, old_dir, new_dir):
 
 
 def fixup_pth_file(filename, old_dir, new_dir):
-    print 'fixing', filename
+    logger.debug('fixing %s' % filename)
     with open(filename, 'rb') as f:
         lines = f.readlines()
     has_change = False
@@ -215,7 +218,7 @@ def fixup_pth_file(filename, old_dir, new_dir):
 
 
 def fixup_egglink_file(filename, old_dir, new_dir):
-    print 'fixing', filename
+    logger.debug('fixing %s' % filename)
     with open(filename, 'rb') as f:
         link = f.read().strip()
     if _dirmatch(link, old_dir):
@@ -228,4 +231,5 @@ if __name__ == '__main__':
     old_dir, new_dir = sys.argv[1:]
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
+    logging.basicConfig(level=logging.WARNING)
     clone_virtualenv(old_dir, new_dir)
