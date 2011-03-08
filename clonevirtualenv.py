@@ -132,7 +132,11 @@ def fixup_syspath_items(syspath, old_dir, new_dir):
         if not os.path.isdir(path):
             continue
         path = os.path.normcase(os.path.abspath(path))
-        if not _dirmatch(path, new_dir):
+        if _dirmatch(path, old_dir):
+            path = path.replace(old_dir, new_dir, 1)
+            if not os.path.exists(path):
+                continue
+        elif not _dirmatch(path, new_dir):
             continue
         root, dirs, files = os.walk(path).next()
         for file_ in files:
