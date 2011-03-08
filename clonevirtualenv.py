@@ -209,8 +209,9 @@ def fixup_pth_file(filename, old_dir, new_dir):
         elif _dirmatch(line, old_dir):
             lines[num] = line.replace(old_dir, new_dir, 1)
             has_change = True
-    with open(filename, 'wb') as f:
-        f.writelines(lines)
+    if has_change:
+        with open(filename, 'wb') as f:
+            f.writelines(lines)
 
 
 def fixup_egglink_file(filename, old_dir, new_dir):
@@ -219,8 +220,8 @@ def fixup_egglink_file(filename, old_dir, new_dir):
         link = f.read().strip()
     if _dirmatch(link, old_dir):
         link = link.replace(old_dir, new_dir, 1)
-    with open(filename, 'wb') as f:
-        f.write('%s\n' % link)
+        with open(filename, 'wb') as f:
+            f.write('%s\n' % link)
 
 
 if __name__ == '__main__':
