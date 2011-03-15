@@ -1,48 +1,20 @@
-"""virtualenv cloning script.
-
-A script for cloning a non-relocatable virtualenv.
-
-Virtualenv provides a way to make virtualenv's relocatable which could then be
-copied as we wanted. However making a virtualenv relocatable this way breaks
-the no-site-packages isolation of the virtualenv as well as other aspects that
-come with relative paths and '/usr/bin/env' shebangs that may be undesirable.
-
-Also, the .pth and .egg-link rewriting doesn't seem to work as intended. This
-attempts to overcome these issues and provide a way to easily clone an
-existing virtualenv.
-
-It performs the following:
-
-- copies sys.argv[1] dir to sys.argv[2]
-- updates the hardcoded VIRTUAL_ENV variable in the activate script to the
-  new repo location. (--relocatable doesn't touch this)
-- updates the shebangs of the various scripts in bin to the new python if
-  they pointed to the old python. (version numbering is retained.)
-
-    it can also change '/usr/bin/env python' shebangs to be absolute too,
-    though this functionality is not exposed at present.
-
-- checks sys.path of the cloned virtualenv and if any of the paths are from
-  the old environment it finds any .pth or .egg-link files within sys.path
-  located in the new environment and makes sure any absolute paths to the
-  old environment are updated to the new environment.
-
-- finally it double checks sys.path again and will fail if there are still
-  paths from the old environment present.
-
-"""
 from __future__ import with_statement
 import logging
+import optparse
 import os
 import shutil
 import subprocess
 import sys
 
-version_info = (0, 1, 1)
+version_info = (0, 1, 2)
 __version__ = '.'.join(map(str, version_info))
 
 
 logger = logging.getLogger()
+
+
+class UserError(Exception):
+    pass
 
 
 def _dirmatch(path, matchwith):
@@ -84,9 +56,9 @@ def _virtualenv_sys(venv_path):
 
 def clone_virtualenv(src_dir, dst_dir):
     if not os.path.exists(src_dir):
-        raise Exception('src dir does not exist')
+        raise UserError('src dir %r does not exist' % src_dir)
     if os.path.exists(dst_dir):
-        raise Exception('dest dir exists')
+        raise UserError('dest dir %r exists' % dst_dir)
     #sys_path = _virtualenv_syspath(src_dir)
     shutil.copytree(src_dir, dst_dir, symlinks=True)
     version, sys_path = _virtualenv_sys(dst_dir)
@@ -227,9 +199,22 @@ def fixup_egglink_file(filename, old_dir, new_dir):
             f.write('%s\n' % link)
 
 
-if __name__ == '__main__':
-    old_dir, new_dir = sys.argv[1:]
+def main():
+    parser = optparse.OptionParser("usage: %prog /path/to/existing/venv"
+        " /path/to/cloned/venv")
+    options, args = parser.parse_args()
+    try:
+        old_dir, new_dir = sys.argv[1:]
+    except ValueError, e:
+        parser.error("not enough arguments given.")
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
     logging.basicConfig(level=logging.WARNING)
-    clone_virtualenv(old_dir, new_dir)
+    try:
+        clone_virtualenv(old_dir, new_dir)
+    except UserError, e:
+        parser.error(str(e))
+
+
+if __name__ == '__main__':
+    main()
