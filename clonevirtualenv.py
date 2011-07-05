@@ -78,15 +78,14 @@ def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
     bin_dir = os.path.join(new_dir, 'bin')
     root, dirs, files = os.walk(bin_dir).next()
     for file_ in files:
+        filename = os.path.join(root, file_)
         if file_ == 'activate':
             fixup_activate(os.path.join(root, file_), old_dir, new_dir)
         elif file_ in ['python', 'python%s' % version, 'activate_this.py']:
             continue
-        elif os.path.islink(os.path.join(root, file_)):
-            target = os.readlink(filename)
-            if _dirmatch(target, old_dir):
-                fixup_link(filename, old_dir, new_dir)
-        elif os.path.isfile(os.path.join(root, file_)):
+        elif os.path.islink(filename):
+            fixup_link(filename, old_dir, new_dir)
+        elif os.path.isfile(filename):
             fixup_script_(root, file_, old_dir, new_dir, version,
                 rewrite_env_python=rewrite_env_python)
 
@@ -146,10 +145,37 @@ def fixup_activate(filename, old_dir, new_dir):
 
 
 def fixup_link(filename, old_dir, new_dir, target=None):
+    print old_dir, new_dir
     logger.debug('fixing %s' % filename)
     if target is None:
         target = os.readlink(filename)
-    raise NotImplementedError()
+
+    origdir = os.path.dirname(os.path.abspath(filename)).replace(
+        new_dir, old_dir)
+    if not os.path.isabs(target):
+        target = os.path.abspath(os.path.join(origdir, target))
+        rellink = True
+    else:
+        rellink = False
+
+    if _dirmatch(target, old_dir):
+        print target, rellink
+        if rellink:
+            # keep relative links, but don't keep original in case it
+            # traversed up out of, then back into the venv.
+            # so, recreate a relative link from absolute.
+            target = target[len(origdir):].lstrip(os.sep)
+        else:
+            target = target.replace(old_dir, new_dir, 1)
+
+    # else: links outside the venv, replaced with absolute path to target.
+    _replace_symlink(filename, target)
+
+
+def _replace_symlink(filename, newtarget):
+    tmpfn = "%s.new" % filename
+    os.symlink(newtarget, tmpfn)
+    os.rename(tmpfn, filename)
 
 
 def fixup_syspath_items(syspath, old_dir, new_dir):
