@@ -145,7 +145,6 @@ def fixup_activate(filename, old_dir, new_dir):
 
 
 def fixup_link(filename, old_dir, new_dir, target=None):
-    print old_dir, new_dir
     logger.debug('fixing %s' % filename)
     if target is None:
         target = os.readlink(filename)
