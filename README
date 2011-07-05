@@ -29,3 +29,5 @@ It performs the following:
 
 - finally it double checks sys.path again and will fail if there are still
   paths from the old environment present.
+
+NOTE: This script requires Python >= 2.5

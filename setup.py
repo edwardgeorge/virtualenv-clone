@@ -1,7 +1,13 @@
+import sys
+
 from setuptools import setup
 
+if __name__ == '__main__' and sys.version_info < (2, 5):
+    raise SystemExit("Python >= 2.5 required for virtualenv-clone")
+
+
 setup(name="virtualenv-clone",
-    version='0.1.2',
+    version='0.2.0',
     description='script to clone virtualenvs.',
     author='Edward George',
     author_email='edwardgeorge@gmail.com',
