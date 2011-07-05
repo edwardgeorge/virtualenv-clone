@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import sys
 
-version_info = (0, 1, 2)
+version_info = (0, 2, 2)
 __version__ = '.'.join(map(str, version_info))
 
 
