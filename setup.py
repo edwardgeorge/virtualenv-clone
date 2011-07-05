@@ -7,7 +7,7 @@ if __name__ == '__main__' and sys.version_info < (2, 5):
 
 
 setup(name="virtualenv-clone",
-    version='0.2.0',
+    version='0.2.1',
     description='script to clone virtualenvs.',
     author='Edward George',
     author_email='edwardgeorge@gmail.com',

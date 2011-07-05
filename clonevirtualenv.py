@@ -159,7 +159,6 @@ def fixup_link(filename, old_dir, new_dir, target=None):
         rellink = False
 
     if _dirmatch(target, old_dir):
-        print target, rellink
         if rellink:
             # keep relative links, but don't keep original in case it
             # traversed up out of, then back into the venv.
