@@ -1,3 +1,4 @@
+#!/opt/python27/bin/python
 from __future__ import with_statement
 import logging
 import optparse
@@ -11,7 +12,7 @@ __version__ = '.'.join(map(str, version_info))
 
 
 logger = logging.getLogger()
-
+ONLY_FIXUP=False
 
 class UserError(Exception):
     pass
@@ -41,7 +42,7 @@ def _dirmatch(path, matchwith):
 def _virtualenv_sys(venv_path):
     "obtain version and path info from a virtualenv."
     executable = os.path.join(venv_path, 'bin', 'python')
-    p = subprocess.Popen(['python',
+    p = subprocess.Popen([executable,
         '-c', 'import sys;'
               'print sys.version[:3];'
               'print "\\n".join(sys.path);'],
@@ -55,27 +56,38 @@ def _virtualenv_sys(venv_path):
 
 
 def clone_virtualenv(src_dir, dst_dir):
+    global ONLY_FIXUP
     if not os.path.exists(src_dir):
         raise UserError('src dir %r does not exist' % src_dir)
-    if os.path.exists(dst_dir):
+    if (not ONLY_FIXUP) and os.path.exists(dst_dir):
         raise UserError('dest dir %r exists' % dst_dir)
     #sys_path = _virtualenv_syspath(src_dir)
-    shutil.copytree(src_dir, dst_dir, symlinks=True)
-    version, sys_path = _virtualenv_sys(dst_dir)
+    if not ONLY_FIXUP:
+        shutil.copytree(src_dir, dst_dir, symlinks=True)
+    if ONLY_FIXUP:
+        version, sys_path = _virtualenv_sys(src_dir)
+    else:
+        version, sys_path = _virtualenv_sys(dst_dir)
     fixup_scripts(src_dir, dst_dir, version)
 
     has_old = lambda s: any(i for i in s if _dirmatch(i, src_dir))
 
-    if has_old(sys_path):
-        # only need to fix stuff in sys.path if we have old
-        # paths in the sys.path of new python env. right?
-        fixup_syspath_items(sys_path, src_dir, dst_dir)
-    remaining = has_old(_virtualenv_sys(dst_dir)[1])
-    assert not remaining, _virtualenv_sys(dst_dir)
+    #if has_old(sys_path):
+    # only need to fix stuff in sys.path if we have old
+    # paths in the sys.path of new python env. right?
+    fixup_syspath_items(sys_path, src_dir, dst_dir)
+    if ONLY_FIXUP:
+        remaining = has_old(_virtualenv_sys(src_dir)[1])
+    else:
+        remaining = has_old(_virtualenv_sys(dst_dir)[1])
+        assert not remaining, _virtualenv_sys(dst_dir)
 
 
 def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
-    bin_dir = os.path.join(new_dir, 'bin')
+    if ONLY_FIXUP:
+        bin_dir = os.path.join(old_dir, 'bin')
+    else:
+        bin_dir = os.path.join(new_dir, 'bin')
     root, dirs, files = os.walk(bin_dir).next()
     for file_ in files:
         filename = os.path.join(root, file_)
@@ -224,13 +236,20 @@ def fixup_egglink_file(filename, old_dir, new_dir):
 
 
 def main():
-    parser = optparse.OptionParser("usage: %prog /path/to/existing/venv"
-        " /path/to/cloned/venv")
+    global ONLY_FIXUP
+    parser = optparse.OptionParser("usage: %prog --source /path/to/existing/venv"
+        " --dest /path/to/cloned/venv [--fixup] ")
+    parser.add_option("--fixup", dest="fixup", default=False, action="store_true",
+                        help=("Do not copy files, only fixup the files in the "
+                              "given source env to point to the new destination"))
+    parser.add_option("--source", dest="source", default="")
+    parser.add_option("--dest", dest="dest", default="")
     options, args = parser.parse_args()
-    try:
-        old_dir, new_dir = sys.argv[1:]
-    except ValueError, e:
+    old_dir = options.source
+    new_dir = options.dest
+    if not old_dir or not new_dir:
         parser.error("not enough arguments given.")
+    ONLY_FIXUP = options.fixup
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
     logging.basicConfig(level=logging.WARNING)
