@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import sys
 
-version_info = (0, 2, 2)
+version_info = (0, 2, 3)
 __version__ = '.'.join(map(str, version_info))
 
 
@@ -43,14 +43,14 @@ def _virtualenv_sys(venv_path):
     executable = os.path.join(venv_path, 'bin', 'python')
     p = subprocess.Popen(['python',
         '-c', 'import sys;'
-              'print sys.version[:3];'
-              'print "\\n".join(sys.path);'],
+              'print (sys.version[:3]);'
+              'print ("\\n".join(sys.path));'],
         executable=executable,
         env={},
         stdout=subprocess.PIPE)
     stdout, err = p.communicate()
     assert not p.returncode and stdout
-    lines = stdout.splitlines()
+    lines = stdout.decode('utf-8').splitlines()
     return lines[0], filter(bool, lines[1:])
 
 
@@ -76,7 +76,7 @@ def clone_virtualenv(src_dir, dst_dir):
 
 def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
     bin_dir = os.path.join(new_dir, 'bin')
-    root, dirs, files = os.walk(bin_dir).next()
+    root, dirs, files = next(os.walk(bin_dir))
     for file_ in files:
         filename = os.path.join(root, file_)
         if file_ == 'activate':
@@ -97,9 +97,8 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
     env_shebang = '#!/usr/bin/env python'
 
     filename = os.path.join(root, file_)
-    f = open(filename, 'rb')
-    lines = f.readlines()
-    f.close()
+    with open(filename, 'rb') as f:
+        lines = f.readlines()
 
     if not lines:
         # warn: empty script
@@ -114,7 +113,7 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
             f.write('%s\n' % shebang)
             f.writelines(lines[1:])
 
-    bang = lines[0].strip()
+    bang = lines[0].decode('utf-8').strip()
 
     if not bang.startswith('#!'):
         return
@@ -135,13 +134,12 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
 
 def fixup_activate(filename, old_dir, new_dir):
     logger.debug('fixing %s' % filename)
-    f = open(filename, 'rb')
-    data = f.read()
-    f.close()
+    with open(filename, 'rb') as f:
+        data = f.read().decode('utf-8')
+
     data = data.replace(old_dir, new_dir)
-    f = open(filename, 'wb')
-    f.write(data)
-    f.close()
+    with open(filename, 'wb') as f:
+        f.write(data.encode('utf-8'))
 
 
 def fixup_link(filename, old_dir, new_dir, target=None):
@@ -202,7 +200,7 @@ def fixup_pth_file(filename, old_dir, new_dir):
         lines = f.readlines()
     has_change = False
     for num, line in enumerate(lines):
-        line = line.strip()
+        line = line.decode('utf-8').strip()
         if not line or line.startswith('#') or line.startswith('import '):
             continue
         elif _dirmatch(line, old_dir):
@@ -216,7 +214,7 @@ def fixup_pth_file(filename, old_dir, new_dir):
 def fixup_egglink_file(filename, old_dir, new_dir):
     logger.debug('fixing %s' % filename)
     with open(filename, 'rb') as f:
-        link = f.read().strip()
+        link = f.read().decode('utf-8').strip()
     if _dirmatch(link, old_dir):
         link = link.replace(old_dir, new_dir, 1)
         with open(filename, 'wb') as f:
@@ -229,14 +227,14 @@ def main():
     options, args = parser.parse_args()
     try:
         old_dir, new_dir = sys.argv[1:]
-    except ValueError, e:
+    except ValueError as e:
         parser.error("not enough arguments given.")
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
     logging.basicConfig(level=logging.WARNING)
     try:
         clone_virtualenv(old_dir, new_dir)
-    except UserError, e:
+    except UserError as e:
         parser.error(str(e))
 
 
