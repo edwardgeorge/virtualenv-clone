@@ -190,7 +190,7 @@ def fixup_syspath_items(syspath, old_dir, new_dir):
                 continue
         elif not _dirmatch(path, new_dir):
             continue
-        root, dirs, files = os.walk(path).next()
+        root, dirs, files = next(os.walk(path))
         for file_ in files:
             filename = os.path.join(root, file_)
             if filename.endswith('.pth'):
@@ -223,7 +223,8 @@ def fixup_egglink_file(filename, old_dir, new_dir):
     if _dirmatch(link, old_dir):
         link = link.replace(old_dir, new_dir, 1)
         with open(filename, 'wb') as f:
-            f.write('%s\n' % link)
+            link = (link + '\n').encode('utf-8')
+            f.write(link)
 
 
 def main():
