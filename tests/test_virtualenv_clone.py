@@ -35,14 +35,14 @@ class TestVirtualenvClone(TestCase):
         with raises(SystemExit):
             clonevirtualenv.main()
 
-    def test_clone_with_1_arg(self, fakeparser):
+    def test_clone_with_1_arg(self):
         import sys
         sys.argv = ['virtualenv-clone', venv_path]
 
         with raises(SystemExit):
             clonevirtualenv.main()
 
-    def test_clone_with_bad_src(self, fakeparser):
+    def test_clone_with_bad_src(self):
         import sys
         sys.argv = ['virtualenv-clone', os.path.join('this','venv','does','not','exist'), clone_path]
 
