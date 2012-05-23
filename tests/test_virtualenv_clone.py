@@ -4,6 +4,7 @@ import subprocess
 import os
 import shutil
 import clonevirtualenv
+import sys
 
 tmplocation = os.environ.get('TMPDIR') or os.environ.get('TMP')
 venv_path = os.path.join(tmplocation,'venv')
@@ -29,21 +30,18 @@ class TestVirtualenvClone(TestCase):
         if os.path.exists(clone_path): shutil.rmtree(clone_path)
 
     def test_clone_with_no_args(self):
-        import sys
         sys.argv = ['virtualenv-clone']
 
         with raises(SystemExit):
             clonevirtualenv.main()
 
     def test_clone_with_1_arg(self):
-        import sys
         sys.argv = ['virtualenv-clone', venv_path]
 
         with raises(SystemExit):
             clonevirtualenv.main()
 
     def test_clone_with_bad_src(self):
-        import sys
         sys.argv = ['virtualenv-clone', os.path.join('this','venv','does','not','exist'), clone_path]
 
         with raises(SystemExit):
@@ -52,7 +50,6 @@ class TestVirtualenvClone(TestCase):
     def test_clone_exists(self):
         """Verify a cloned virtualenv exists"""
         # run virtualenv-clone
-        import sys
         sys.argv = ['virtualenv-clone', venv_path, clone_path]
         clonevirtualenv.main()
 

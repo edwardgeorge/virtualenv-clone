@@ -80,7 +80,7 @@ def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
     root, dirs, files = next(os.walk(bin_dir))
     for file_ in files:
         filename = os.path.join(root, file_)
-        if file_ == 'activate':
+        if 'activate' in file_:
             fixup_activate(os.path.join(root, file_), old_dir, new_dir)
         elif file_.endswith('.pyc'):
             # ignore compiled files
