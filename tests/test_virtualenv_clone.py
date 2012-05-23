@@ -4,7 +4,6 @@ import subprocess
 import os
 import shutil
 import clonevirtualenv
-import fudge
 
 tmplocation = os.environ.get('TMPDIR') or os.environ.get('TMP')
 venv_path = os.path.join(tmplocation,'venv')
@@ -29,38 +28,23 @@ class TestVirtualenvClone(TestCase):
         if os.path.exists(venv_path): shutil.rmtree(venv_path)
         if os.path.exists(clone_path): shutil.rmtree(clone_path)
 
-    @fudge.patch('optparse.OptionParser')
-    def test_clone_with_no_args(self, fakeparser):
+    def test_clone_with_no_args(self):
         import sys
         sys.argv = ['virtualenv-clone']
-
-        (fakeparser.expects_call().returns_fake()
-            .expects('parse_args').returns([{},[]])
-            .provides('error').calls(lambda obj: sys.exit(2)))
 
         with raises(SystemExit):
             clonevirtualenv.main()
 
-    @fudge.patch('optparse.OptionParser')
     def test_clone_with_1_arg(self, fakeparser):
         import sys
         sys.argv = ['virtualenv-clone', venv_path]
 
-        (fakeparser.expects_call().returns_fake()
-            .expects('parse_args').returns([{},[]])
-            .provides('error').calls(lambda obj: sys.exit(2)))
-
         with raises(SystemExit):
             clonevirtualenv.main()
 
-    @fudge.patch('optparse.OptionParser')
     def test_clone_with_bad_src(self, fakeparser):
         import sys
         sys.argv = ['virtualenv-clone', os.path.join('this','venv','does','not','exist'), clone_path]
-
-        (fakeparser.expects_call().returns_fake()
-            .expects('parse_args').returns([{},[]])
-            .provides('error').calls(lambda obj: sys.exit(2)))
 
         with raises(SystemExit):
             clonevirtualenv.main()
