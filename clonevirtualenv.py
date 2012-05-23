@@ -109,8 +109,9 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
         shebang = new_shebang
         if version:
             shebang = shebang + version
+        shebang = (shebang + '\n').encode('utf-8')
         with open(filename, 'wb') as f:
-            f.write('%s\n' % shebang)
+            f.write(shebang)
             f.writelines(lines[1:])
 
     bang = lines[0].decode('utf-8').strip()
