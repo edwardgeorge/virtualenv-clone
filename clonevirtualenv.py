@@ -60,7 +60,8 @@ def clone_virtualenv(src_dir, dst_dir):
     if os.path.exists(dst_dir):
         raise UserError('dest dir %r exists' % dst_dir)
     #sys_path = _virtualenv_syspath(src_dir)
-    shutil.copytree(src_dir, dst_dir, symlinks=True)
+    shutil.copytree(src_dir, dst_dir, symlinks=True,
+            ignore=shutil.ignore_patterns('*.pyc'))
     version, sys_path = _virtualenv_sys(dst_dir)
     fixup_scripts(src_dir, dst_dir, version)
 
@@ -81,6 +82,9 @@ def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
         filename = os.path.join(root, file_)
         if file_ == 'activate':
             fixup_activate(os.path.join(root, file_), old_dir, new_dir)
+        elif file_.endswith('.pyc'):
+            # ignore compiled files
+            continue
         elif file_ in ['python', 'python%s' % version, 'activate_this.py']:
             continue
         elif os.path.islink(filename):

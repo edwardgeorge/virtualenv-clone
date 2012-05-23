@@ -60,20 +60,25 @@ class TestVirtualenvClone(TestCase):
         assert os.path.exists(clone_path), 'Cloned Virtualenv does not exists'
 
     def test_clone_contents(self):
-        """Walk the virtualenv and clonedenv verifying contents of each"""
+        """Walk the virtualenv and verify equivalent in clonedenv"""
 
-        import sys
         sys.argv = ['virtualenv-clone', venv_path, clone_path]
         clonevirtualenv.main()
 
         for root, dirs, files in os.walk(venv_path):
             clone_root = root.replace(venv_path,clone_path)
-            for _dir in dirs:
-                _dir_in_clone = os.path.join(clone_root,_dir)
-                assert os.path.exists(_dir_in_clone),\
-                    'Directory %s is missing from cloned virtualenv' % _dir
+            for dir_ in dirs:
+                dir_in_clone = os.path.join(clone_root,dir_)
+                assert os.path.exists(dir_in_clone),\
+                    'Directory %s is missing from cloned virtualenv' % dir_
 
-            for _file in files:
-                _file_in_clone = os.path.join(clone_root,_file)
-                assert os.path.exists(_file_in_clone),\
-                    'File %s is missing from cloned virtualenv' % _file
+            for file_ in files:
+                if file_.endswith('.pyc'):
+                    continue
+                file_in_clone = os.path.join(clone_root,file_)
+                assert os.path.exists(file_in_clone),\
+                    'File %s is missing from cloned virtualenv' % file_
+
+                with open(file_in_clone, 'rb') as f:
+                    lines = f.read()
+                    assert venv_path not in lines, 'Found copied path in %s' % file_in_clone
