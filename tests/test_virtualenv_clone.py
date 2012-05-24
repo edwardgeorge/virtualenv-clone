@@ -1,21 +1,16 @@
+import os
+import subprocess
 from unittest import TestCase
 from pytest import raises
-import subprocess
-import os
-import shutil
 import clonevirtualenv
 import sys
-
-tmplocation = os.environ.get('TMPDIR') or os.environ.get('TMP')
-venv_path = os.path.join(tmplocation,'venv')
-clone_path = os.path.join(tmplocation,'clone_venv')
+from tests import tmplocation, venv_path, clone_path, versions, clean
 
 class TestVirtualenvClone(TestCase):
 
     def setUp(self):
         """Clean from previous testing"""
-        if os.path.exists(venv_path): shutil.rmtree(venv_path)
-        if os.path.exists(clone_path): shutil.rmtree(clone_path)
+        clean()
 
         """Create a virtualenv to clone"""
         assert subprocess.call(['virtualenv', venv_path]) == 0, "Error running virtualenv"
@@ -26,8 +21,7 @@ class TestVirtualenvClone(TestCase):
 
     def tearDown(self):
         """Clean up our testing"""
-        if os.path.exists(venv_path): shutil.rmtree(venv_path)
-        if os.path.exists(clone_path): shutil.rmtree(clone_path)
+        clean()
 
     def test_clone_with_no_args(self):
         sys.argv = ['virtualenv-clone']
@@ -57,7 +51,7 @@ class TestVirtualenvClone(TestCase):
         assert os.path.exists(clone_path), 'Cloned Virtualenv does not exists'
 
     def test_clone_contents(self):
-        """Walk the virtualenv and verify equivalent in clonedenv"""
+        """Walk the virtualenv and verify clonedenv contents"""
 
         sys.argv = ['virtualenv-clone', venv_path, clone_path]
         clonevirtualenv.main()
@@ -72,10 +66,14 @@ class TestVirtualenvClone(TestCase):
             for file_ in files:
                 if file_.endswith('.pyc'):
                     continue
+
                 file_in_clone = os.path.join(clone_root,file_)
                 assert os.path.exists(file_in_clone),\
                     'File %s is missing from cloned virtualenv' % file_
 
                 with open(file_in_clone, 'rb') as f:
                     lines = f.read()
-                    assert venv_path not in lines, 'Found copied path in %s' % file_in_clone
+                    assert venv_path not in lines, 'Found source path in cloned file %s' % file_in_clone
+
+#    def test_clone_egglink_file(self):
+#        subprocess(['touch',os.path.join(venv_path,'lib','python','site-packages','mypackage.py'])
