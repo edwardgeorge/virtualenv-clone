@@ -36,7 +36,8 @@ class TestVirtualenvClone(TestCase):
             clonevirtualenv.main()
 
     def test_clone_with_bad_src(self):
-        sys.argv = ['virtualenv-clone', os.path.join('this','venv','does','not','exist'), clone_path]
+        sys.argv = ['virtualenv-clone', 
+            os.path.join('this','venv','does','not','exist'), clone_path]
 
         with raises(SystemExit):
             clonevirtualenv.main()
@@ -64,16 +65,28 @@ class TestVirtualenvClone(TestCase):
                     'Directory %s is missing from cloned virtualenv' % dir_
 
             for file_ in files:
-                if file_.endswith('.pyc'):
+                if file_.endswith('.pyc') or\
+                    file_.endswith('.exe') or\
+                    file_ == 'python':
+                    # binarys fail reading and
+                    # compiled will be recomipled
                     continue
-
+    
                 file_in_clone = os.path.join(clone_root,file_)
                 assert os.path.exists(file_in_clone),\
                     'File %s is missing from cloned virtualenv' % file_
 
+                if os.path.islink(file_in_clone):
+                    target = os.readlink(file_in_clone)
+                    assert venv_path != target
+                    assert venv_path not in target
+                    assert os.path.basename(venv_path) not in target
+                    continue
+
                 with open(file_in_clone, 'rb') as f:
-                    lines = f.read()
-                    assert venv_path not in lines, 'Found source path in cloned file %s' % file_in_clone
+                    lines = f.read().decode('utf-8')
+                    assert venv_path not in lines,\
+                        'Found source path in cloned file %s' % file_in_clone
 
 #    def test_clone_egglink_file(self):
 #        subprocess(['touch',os.path.join(venv_path,'lib','python','site-packages','mypackage.py'])
