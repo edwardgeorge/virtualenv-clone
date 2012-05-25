@@ -3,7 +3,7 @@ import shutil
 
 # Global test variables
 tmplocation = os.environ.get('TMPDIR') or os.environ.get('TMP')
-venv_path = os.path.join(tmplocation,'venv')
+venv_path = os.path.join(tmplocation,'srs_venv')
 clone_path = os.path.join(tmplocation,'clone_venv')
 versions = ['2.6','2.7','3.2']
 
