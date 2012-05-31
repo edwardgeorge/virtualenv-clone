@@ -4,7 +4,8 @@ from unittest import TestCase
 from pytest import raises
 import clonevirtualenv
 import sys
-from tests import tmplocation, venv_path, clone_path, versions, clean
+from tests import venv_path, clone_path, clean
+
 
 class TestVirtualenvClone(TestCase):
 
@@ -67,9 +68,10 @@ class TestVirtualenvClone(TestCase):
             for file_ in files:
                 if file_.endswith('.pyc') or\
                     file_.endswith('.exe') or\
-                    file_ == 'python':
+                    file_.endswith('.egg') or\
+                    file_.startswith('python'):
                     # binarys fail reading and
-                    # compiled will be recomipled
+                    # compiled will be recompiled
                     continue
     
                 file_in_clone = os.path.join(clone_root,file_)

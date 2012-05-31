@@ -61,7 +61,11 @@ class TestVirtualenvSys(TestCase):
             clean()
 
     def test_clone_syspath(self):
-        """Verify syspath for cloned virtualenvs"""
+        """
+        Verify syspath for cloned virtualenvs
+
+        This really is a test for fixup_syspath as well
+        """
         for version in versions:
             # create a virtualenv
             assert subprocess.call(['virtualenv', '-p', 'python' + version,
