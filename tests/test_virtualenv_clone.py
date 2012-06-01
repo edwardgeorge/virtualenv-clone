@@ -58,6 +58,8 @@ class TestVirtualenvClone(TestCase):
         sys.argv = ['virtualenv-clone', venv_path, clone_path]
         clonevirtualenv.main()
 
+        version = clonevirtualenv._virtualenv_sys(venv_path)[0]
+
         for root, dirs, files in os.walk(venv_path):
             clone_root = root.replace(venv_path,clone_path)
             for dir_ in dirs:
@@ -69,7 +71,7 @@ class TestVirtualenvClone(TestCase):
                 if file_.endswith('.pyc') or\
                     file_.endswith('.exe') or\
                     file_.endswith('.egg') or\
-                    file_.startswith('python'):
+                    file_ in ['python', 'python%s' % version]:
                     # binarys fail reading and
                     # compiled will be recompiled
                     continue

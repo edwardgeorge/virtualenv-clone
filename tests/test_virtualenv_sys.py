@@ -3,7 +3,7 @@ import subprocess
 from unittest import TestCase
 import clonevirtualenv
 import sys
-from tests import tmplocation, venv_path, clone_path, versions, clean
+from tests import venv_path, clone_path, versions, clean
 
 class TestVirtualenvSys(TestCase):
 
