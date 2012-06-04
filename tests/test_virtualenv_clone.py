@@ -1,28 +1,11 @@
 import os
-import subprocess
-from unittest import TestCase
 from pytest import raises
 import clonevirtualenv
 import sys
-from tests import venv_path, clone_path, clean
+from tests import venv_path, clone_path, TestBase
 
 
-class TestVirtualenvClone(TestCase):
-
-    def setUp(self):
-        """Clean from previous testing"""
-        clean()
-
-        """Create a virtualenv to clone"""
-        assert subprocess.call(['virtualenv', venv_path]) == 0, "Error running virtualenv"
-
-        # verify starting point...
-        assert os.path.exists(venv_path), 'Virtualenv to clone does not exists'
-
-
-    def tearDown(self):
-        """Clean up our testing"""
-        clean()
+class TestVirtualenvClone(TestBase):
 
     def test_clone_with_no_args(self):
         sys.argv = ['virtualenv-clone']
