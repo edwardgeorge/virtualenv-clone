@@ -237,14 +237,15 @@ def main():
     options, args = parser.parse_args()
     try:
         old_dir, new_dir = sys.argv[1:]
-    except ValueError as e:
+    except ValueError:
         parser.error("not enough arguments given.")
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
     logging.basicConfig(level=logging.WARNING)
     try:
         clone_virtualenv(old_dir, new_dir)
-    except UserError as e:
+    except UserError:
+        e = sys.exc_info()[1]
         parser.error(str(e))
 
 
