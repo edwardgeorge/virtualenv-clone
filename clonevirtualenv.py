@@ -13,6 +13,10 @@ __version__ = '.'.join(map(str, version_info))
 logger = logging.getLogger()
 
 
+if sys.version_info < (2, 6):
+    next = lambda gen: gen.next()
+
+
 class UserError(Exception):
     pass
 
