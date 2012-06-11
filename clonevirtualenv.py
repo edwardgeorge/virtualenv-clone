@@ -126,7 +126,11 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
             f.write(shebang)
             f.writelines(lines[1:])
 
-    bang = lines[0].decode('utf-8').strip()
+    try:
+        bang = lines[0].decode('utf-8').strip()
+    except UnicodeDecodeError, e:
+        # binary file
+        return
 
     if not bang.startswith('#!'):
         return
