@@ -2,6 +2,7 @@ from __future__ import with_statement
 import logging
 import optparse
 import os
+import re
 import shutil
 import subprocess
 import sys
