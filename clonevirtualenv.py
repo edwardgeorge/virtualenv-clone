@@ -110,6 +110,10 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
 
     filename = os.path.join(root, file_)
     with open(filename, 'rb') as f:
+        if f.read(2) != '#!':
+            # no shebang
+            return
+        f.seek(0)
         lines = f.readlines()
 
     if not lines:
