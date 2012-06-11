@@ -82,15 +82,19 @@ def clone_virtualenv(src_dir, dst_dir):
 def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
     bin_dir = os.path.join(new_dir, 'bin')
     root, dirs, files = next(os.walk(bin_dir))
+    pybinre = re.compile('pythonw?([0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$')
     for file_ in files:
         filename = os.path.join(root, file_)
-        if 'activate' in file_:
-            fixup_activate(os.path.join(root, file_), old_dir, new_dir)
+        if file_ in ['python', 'python%s' % version, 'activate_this.py']:
+            continue
+        elif file_.startswith('python') and pybinre.match(file_):
+            # ignore other possible python binaries
+            continue
         elif file_.endswith('.pyc'):
             # ignore compiled files
             continue
-        elif file_ in ['python', 'python%s' % version, 'activate_this.py']:
-            continue
+        elif file_ == 'activate' or file_.startswith('activate.'):
+            fixup_activate(os.path.join(root, file_), old_dir, new_dir)
         elif os.path.islink(filename):
             fixup_link(filename, old_dir, new_dir)
         elif os.path.isfile(filename):
