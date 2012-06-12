@@ -111,7 +111,7 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
 
     filename = os.path.join(root, file_)
     with open(filename, 'rb') as f:
-        if f.read(2) != '#!':
+        if f.read(2) != b'#!':
             # no shebang
             return
         f.seek(0)
@@ -133,7 +133,7 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
 
     try:
         bang = lines[0].decode('utf-8').strip()
-    except UnicodeDecodeError as e:
+    except UnicodeDecodeError:
         # binary file
         return
 
