@@ -5,14 +5,13 @@ import subprocess
 from unittest import TestCase
 
 # Global test variables
-tmplocation = str(py.path.local.mkdtemp().realpath())
+tmplocation = py.path.local.mkdtemp().strpath
 venv_path = os.path.join(tmplocation,'srs_venv')
 clone_path = os.path.join(tmplocation,'clone_venv')
 versions = ['2.6','2.7','3.2']
 
 def clean():
-    if os.path.exists(venv_path): shutil.rmtree(venv_path)
-    if os.path.exists(clone_path): shutil.rmtree(clone_path)
+    if os.path.exists(tmplocation): shutil.rmtree(tmplocation)
 
 
 class TestBase(TestCase):
