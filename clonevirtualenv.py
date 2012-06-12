@@ -38,7 +38,7 @@ def _dirmatch(path, matchwith):
     """
     matchlen = len(matchwith)
     if (path.startswith(matchwith)
-        and path[matchlen:matchlen+1] in [os.sep, '']):
+        and path[matchlen:matchlen + 1] in [os.sep, '']):
         return True
     return False
 
@@ -133,7 +133,7 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
 
     try:
         bang = lines[0].decode('utf-8').strip()
-    except UnicodeDecodeError, e:
+    except UnicodeDecodeError as e:
         # binary file
         return
 
