@@ -25,7 +25,7 @@ class ToxTest(TestCommand):
 
 
 setup(name="virtualenv-clone",
-    version='0.2.3',
+    version='0.2.4',
     description='script to clone virtualenvs.',
     author='Edward George',
     author_email='edwardgeorge@gmail.com',
