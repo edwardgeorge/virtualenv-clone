@@ -1,11 +1,11 @@
 import os
 import shutil
 import subprocess
-import tmpfile
+import tempfile
 from unittest import TestCase
 
 # Global test variables
-tmplocation = tmpfile.mkdtemp()
+tmplocation = tempfile.mkdtemp()
 venv_path = os.path.join(tmplocation,'srs_venv')
 clone_path = os.path.join(tmplocation,'clone_venv')
 versions = ['2.6','2.7','3.2']
