@@ -65,9 +65,12 @@ def clone_virtualenv(src_dir, dst_dir):
     if os.path.exists(dst_dir):
         raise UserError('dest dir %r exists' % dst_dir)
     #sys_path = _virtualenv_syspath(src_dir)
+    logger.info('cloning virtualenv \'%s\' => \'%s\'...' %
+            (src_dir, dst_dir))
     shutil.copytree(src_dir, dst_dir, symlinks=True,
             ignore=shutil.ignore_patterns('*.pyc'))
     version, sys_path = _virtualenv_sys(dst_dir)
+    logger.info('fixing scripts in bin...')
     fixup_scripts(src_dir, dst_dir, version)
 
     has_old = lambda s: any(i for i in s if _dirmatch(i, src_dir))
@@ -75,6 +78,7 @@ def clone_virtualenv(src_dir, dst_dir):
     if has_old(sys_path):
         # only need to fix stuff in sys.path if we have old
         # paths in the sys.path of new python env. right?
+        logger.info('fixing paths in sys.path...')
         fixup_syspath_items(sys_path, src_dir, dst_dir)
     remaining = has_old(_virtualenv_sys(dst_dir)[1])
     assert not remaining, _virtualenv_sys(dst_dir)
@@ -245,16 +249,22 @@ def fixup_egglink_file(filename, old_dir, new_dir):
 
 
 def main():
-    parser = optparse.OptionParser("usage: %prog /path/to/existing/venv"
-        " /path/to/cloned/venv")
+    parser = optparse.OptionParser("usage: %prog [options]"
+        " /path/to/existing/venv /path/to/cloned/venv")
+    parser.add_option('-v',
+            action="store_true",
+            dest='verbose',
+            default=False,
+            help='verbose')
     options, args = parser.parse_args()
     try:
-        old_dir, new_dir = sys.argv[1:]
+        old_dir, new_dir = args
     except ValueError:
         parser.error("not enough arguments given.")
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
-    logging.basicConfig(level=logging.WARNING)
+    loglevel = logging.INFO if options.verbose else logging.WARNING
+    logging.basicConfig(level=loglevel, format='%(message)s')
     try:
         clone_virtualenv(old_dir, new_dir)
     except UserError:
