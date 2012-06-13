@@ -252,10 +252,10 @@ def main():
     parser = optparse.OptionParser("usage: %prog [options]"
         " /path/to/existing/venv /path/to/cloned/venv")
     parser.add_option('-v',
-            action="store_true",
+            action="count",
             dest='verbose',
             default=False,
-            help='verbose')
+            help='verbosity')
     options, args = parser.parse_args()
     try:
         old_dir, new_dir = args
@@ -263,7 +263,8 @@ def main():
         parser.error("not enough arguments given.")
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
-    loglevel = logging.INFO if options.verbose else logging.WARNING
+    loglevel = (logging.WARNING, logging.INFO, logging.DEBUG)[min(2,
+            options.verbose)]
     logging.basicConfig(level=loglevel, format='%(message)s')
     try:
         clone_virtualenv(old_dir, new_dir)
