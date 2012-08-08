@@ -46,11 +46,12 @@ def _dirmatch(path, matchwith):
 def _virtualenv_sys(venv_path):
     "obtain version and path info from a virtualenv."
     executable = os.path.join(venv_path, 'bin', 'python')
-    p = subprocess.Popen(['python',
+    # Must use "executable" as the first argument rather than as the
+    # keyword argument "executable" to get correct value from sys.path
+    p = subprocess.Popen([executable,
         '-c', 'import sys;'
               'print (sys.version[:3]);'
               'print ("\\n".join(sys.path));'],
-        executable=executable,
         env={},
         stdout=subprocess.PIPE)
     stdout, err = p.communicate()
