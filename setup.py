@@ -30,6 +30,7 @@ setup(name="virtualenv-clone",
     author='Edward George',
     author_email='edwardgeorge@gmail.com',
     url='http://github.com/edwardgeorge/virtualenv-clone',
+    license="MIT",
     py_modules=["clonevirtualenv"],
     entry_points={
         'console_scripts': [
