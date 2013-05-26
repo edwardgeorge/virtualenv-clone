@@ -18,6 +18,11 @@ if sys.version_info < (2, 6):
     next = lambda gen: gen.next()
 
 
+env_bin_dir = 'bin'
+if sys.platform in ('win32', 'cygwin'):
+    env_bin_dir = 'Scripts'
+
+
 class UserError(Exception):
     pass
 
@@ -45,7 +50,7 @@ def _dirmatch(path, matchwith):
 
 def _virtualenv_sys(venv_path):
     "obtain version and path info from a virtualenv."
-    executable = os.path.join(venv_path, 'bin', 'python')
+    executable = os.path.join(venv_path, env_bin_dir, 'python')
     # Must use "executable" as the first argument rather than as the
     # keyword argument "executable" to get correct value from sys.path
     p = subprocess.Popen([executable,
@@ -86,7 +91,7 @@ def clone_virtualenv(src_dir, dst_dir):
 
 
 def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
-    bin_dir = os.path.join(new_dir, 'bin')
+    bin_dir = os.path.join(new_dir, env_bin_dir)
     root, dirs, files = next(os.walk(bin_dir))
     pybinre = re.compile('pythonw?([0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$')
     for file_ in files:
