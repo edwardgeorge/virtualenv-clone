@@ -19,7 +19,7 @@ if sys.version_info < (2, 6):
 
 
 env_bin_dir = 'bin'
-if sys.platform in ('win32', 'cygwin'):
+if sys.platform == 'win32':
     env_bin_dir = 'Scripts'
 
 
