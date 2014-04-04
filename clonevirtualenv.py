@@ -65,7 +65,7 @@ def _virtualenv_sys(venv_path):
     return lines[0], filter(bool, lines[1:])
 
 
-def clone_virtualenv(src_dir, dst_dir):
+def clone_virtualenv(src_dir, dst_dir, original_dir):
     if not os.path.exists(src_dir):
         raise UserError('src dir %r does not exist' % src_dir)
     if os.path.exists(dst_dir):
@@ -77,7 +77,7 @@ def clone_virtualenv(src_dir, dst_dir):
             ignore=shutil.ignore_patterns('*.pyc'))
     version, sys_path = _virtualenv_sys(dst_dir)
     logger.info('fixing scripts in bin...')
-    fixup_scripts(src_dir, dst_dir, version)
+    fixup_scripts(src_dir, dst_dir, original_dir, version)
 
     has_old = lambda s: any(i for i in s if _dirmatch(i, src_dir))
 
@@ -90,7 +90,8 @@ def clone_virtualenv(src_dir, dst_dir):
     assert not remaining, _virtualenv_sys(dst_dir)
 
 
-def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
+def fixup_scripts(old_dir, new_dir, original_dir, version,
+                  rewrite_env_python=False):
     bin_dir = os.path.join(new_dir, env_bin_dir)
     root, dirs, files = next(os.walk(bin_dir))
     pybinre = re.compile('pythonw?([0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$')
@@ -105,17 +106,18 @@ def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
             # ignore compiled files
             continue
         elif file_ == 'activate' or file_.startswith('activate.'):
-            fixup_activate(os.path.join(root, file_), old_dir, new_dir)
+            fixup_activate(os.path.join(root, file_), old_dir, new_dir,
+                           original_dir)
         elif os.path.islink(filename):
-            fixup_link(filename, old_dir, new_dir)
+            fixup_link(filename, old_dir, new_dir, original_dir)
         elif os.path.isfile(filename):
-            fixup_script_(root, file_, old_dir, new_dir, version,
+            fixup_script_(root, file_, old_dir, new_dir, original_dir, version,
                 rewrite_env_python=rewrite_env_python)
 
 
-def fixup_script_(root, file_, old_dir, new_dir, version,
+def fixup_script_(root, file_, old_dir, new_dir, original_dir, version,
                   rewrite_env_python=False):
-    old_shebang = '#!%s/bin/python' % os.path.normcase(os.path.abspath(old_dir))
+    old_shebang = '#!%s/bin/python' % os.path.normcase(os.path.abspath(original_dir))
     new_shebang = '#!%s/bin/python' % os.path.normcase(os.path.abspath(new_dir))
     env_shebang = '#!/usr/bin/env python'
 
@@ -164,37 +166,38 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
         return
 
 
-def fixup_activate(filename, old_dir, new_dir):
+def fixup_activate(filename, old_dir, new_dir, original_dir):
     logger.debug('fixing %s' % filename)
     with open(filename, 'rb') as f:
         data = f.read().decode('utf-8')
 
-    data = data.replace(old_dir, new_dir)
+    data = data.replace(original_dir, new_dir)
     with open(filename, 'wb') as f:
         f.write(data.encode('utf-8'))
 
 
-def fixup_link(filename, old_dir, new_dir, target=None):
+def fixup_link(filename, old_dir, new_dir, original_dir, target=None):
     logger.debug('fixing %s' % filename)
     if target is None:
         target = os.readlink(filename)
 
     origdir = os.path.dirname(os.path.abspath(filename)).replace(
-        new_dir, old_dir)
+        new_dir, original_dir)
+
     if not os.path.isabs(target):
         target = os.path.abspath(os.path.join(origdir, target))
         rellink = True
     else:
         rellink = False
 
-    if _dirmatch(target, old_dir):
+    if _dirmatch(target, original_dir):
         if rellink:
             # keep relative links, but don't keep original in case it
             # traversed up out of, then back into the venv.
             # so, recreate a relative link from absolute.
             target = target[len(origdir):].lstrip(os.sep)
         else:
-            target = target.replace(old_dir, new_dir, 1)
+            target = target.replace(original_dir, new_dir, 1)
 
     # else: links outside the venv, replaced with absolute path to target.
     _replace_symlink(filename, target)
@@ -206,13 +209,13 @@ def _replace_symlink(filename, newtarget):
     os.rename(tmpfn, filename)
 
 
-def fixup_syspath_items(syspath, old_dir, new_dir):
+def fixup_syspath_items(syspath, old_dir, new_dir, original_dir):
     for path in syspath:
         if not os.path.isdir(path):
             continue
         path = os.path.normcase(os.path.abspath(path))
-        if _dirmatch(path, old_dir):
-            path = path.replace(old_dir, new_dir, 1)
+        if _dirmatch(path, original_dir):
+            path = path.replace(original_dir, new_dir, 1)
             if not os.path.exists(path):
                 continue
         elif not _dirmatch(path, new_dir):
@@ -221,9 +224,9 @@ def fixup_syspath_items(syspath, old_dir, new_dir):
         for file_ in files:
             filename = os.path.join(root, file_)
             if filename.endswith('.pth'):
-                fixup_pth_file(filename, old_dir, new_dir)
+                fixup_pth_file(filename, original_dir, new_dir)
             elif filename.endswith('.egg-link'):
-                fixup_egglink_file(filename, old_dir, new_dir)
+                fixup_egglink_file(filename, original_dir, new_dir)
 
 
 def fixup_pth_file(filename, old_dir, new_dir):
@@ -262,18 +265,28 @@ def main():
             dest='verbose',
             default=False,
             help='verbosity')
+    parser.add_option('--original-dir',
+                      '-o',
+                      dest='original_dir',
+                      help='The path where this venv was originally built'
+                           ' if different from the current path')
     options, args = parser.parse_args()
     try:
         old_dir, new_dir = args
     except ValueError:
         parser.error("not enough arguments given.")
+
+    original_dir = options.original_dir
+    if not original_dir:
+        original_dir = old_dir
+
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
     loglevel = (logging.WARNING, logging.INFO, logging.DEBUG)[min(2,
             options.verbose)]
     logging.basicConfig(level=loglevel, format='%(message)s')
     try:
-        clone_virtualenv(old_dir, new_dir)
+        clone_virtualenv(old_dir, new_dir, original_dir)
     except UserError:
         e = sys.exc_info()[1]
         parser.error(str(e))
