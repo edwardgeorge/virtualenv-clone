@@ -86,8 +86,9 @@ def clone_virtualenv(src_dir, dst_dir):
         # paths in the sys.path of new python env. right?
         logger.info('fixing paths in sys.path...')
         fixup_syspath_items(sys_path, src_dir, dst_dir)
-    remaining = has_old(_virtualenv_sys(dst_dir)[1])
-    assert not remaining, _virtualenv_sys(dst_dir)
+    v_sys = _virtualenv_sys(dst_dir)
+    remaining = has_old(v_sys[1])
+    assert not remaining, v_sys
 
 
 def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
