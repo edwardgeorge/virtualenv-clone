@@ -3,10 +3,12 @@ from __future__ import with_statement
 import logging
 import optparse
 import os
+import os.path
 import re
 import shutil
 import subprocess
 import sys
+import itertools
 
 version_info = (0, 2, 6)
 __version__ = '.'.join(map(str, version_info))
@@ -90,6 +92,25 @@ def clone_virtualenv(src_dir, dst_dir):
     v_sys = _virtualenv_sys(dst_dir)
     remaining = has_old(v_sys[1])
     assert not remaining, v_sys
+    fix_symlink_if_necessary(src_dir, dst_dir)
+
+def fix_symlink_if_necessary(src_dir, dst_dir):
+    #sometimes the source virtual environment has symlinks that point to itself
+    #one example is $OLD_VIRTUAL_ENV/local/lib points to $OLD_VIRTUAL_ENV/lib
+    #this function makes sure
+    #$NEW_VIRTUAL_ENV/local/lib will point to $NEW_VIRTUAL_ENV/lib
+    #usually this goes unnoticed unless one tries to upgrade a package though pip, so this bug is hard to find.
+    logger.info("scanning for internal symlinks that point to the original virtual env")
+    for dirpath, dirnames, filenames in os.walk(dst_dir):
+        for a_file in itertools.chain(filenames, dirnames):
+            full_file_path = os.path.join(dirpath, a_file)
+            if os.path.islink(full_file_path):
+                target = os.path.realpath(full_file_path)
+                if target.startswith(src_dir):
+                    new_target = target.replace(src_dir, dst_dir)
+                    logger.debug('fixing symlink in {}'.format(full_file_path))
+                    os.remove(full_file_path)
+                    os.symlink(new_target, full_file_path)
 
 
 def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
