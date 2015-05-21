@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from __future__ import with_statement
 import logging
 import optparse
@@ -7,7 +8,7 @@ import shutil
 import subprocess
 import sys
 
-version_info = (0, 2, 4)
+version_info = (0, 2, 6)
 __version__ = '.'.join(map(str, version_info))
 
 
@@ -267,6 +268,7 @@ def main():
     try:
         old_dir, new_dir = args
     except ValueError:
+        print("virtualenv-close {}".format(__version__))
         parser.error("not enough arguments given.")
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
