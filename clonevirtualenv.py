@@ -289,7 +289,7 @@ def main():
     try:
         old_dir, new_dir = args
     except ValueError:
-        print("virtualenv-close {}".format(__version__))
+        print("virtualenv-clone {}".format(__version__))
         parser.error("not enough arguments given.")
     old_dir = os.path.normpath(os.path.abspath(old_dir))
     new_dir = os.path.normpath(os.path.abspath(new_dir))
