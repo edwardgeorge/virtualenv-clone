@@ -170,6 +170,11 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
         # binary file
         return
 
+    # This takes care of the scheme in which shebang is of type
+    # '#!/venv/bin/python3' while the version of system python
+    # is of type 3.x e.g. 3.5.
+    short_version = bang[len(old_shebang):]
+
     if not bang.startswith('#!'):
         return
     elif bang == old_shebang:
@@ -177,6 +182,10 @@ def fixup_script_(root, file_, old_dir, new_dir, version,
     elif (bang.startswith(old_shebang)
           and bang[len(old_shebang):] == version):
         rewrite_shebang(version)
+    elif (bang.startswith(old_shebang)
+          and short_version
+          and bang[len(old_shebang):] == short_version):
+        rewrite_shebang(short_version)
     elif rewrite_env_python and bang.startswith(env_shebang):
         if bang == env_shebang:
             rewrite_shebang()
