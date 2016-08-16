@@ -152,3 +152,38 @@ if __name__ == '__main__':
         assert clone_path in data
 
         assert clone_path + '/bin/python2.7' in data
+
+    def test_fixup_script_different_version(self):
+        '''Verify if version is updated'''
+
+        script = '''#!%s/bin/python2
+# EASY-INSTALL-ENTRY-SCRIPT: 'console_scripts'
+import sys
+
+if __name__ == '__main__':
+    print('Testing VirtualEnv-Clone!')
+    sys.exit()''' % venv_path
+
+        # want to do this manually,
+        # so going to call clone before the file exists
+        # run virtualenv-clone
+        sys.argv = ['virtualenv-clone', venv_path, clone_path]
+        clonevirtualenv.main()
+
+        root = os.path.join(clone_path, 'bin')
+        new_ = os.path.join(clone_path, 'bin', 'clonetest')
+        # write the file straight to the cloned
+        with open(new_, 'w') as f:
+            f.write(script)
+
+        # run fixup
+        clonevirtualenv.fixup_script_(root,
+            'clonetest', venv_path, clone_path, '2.7')
+
+        with open(new_, 'r') as f:
+            data = f.read()
+
+        assert venv_path not in data
+        assert clone_path in data
+
+        assert clone_path + '/bin/python2' in data
