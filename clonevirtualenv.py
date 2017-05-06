@@ -192,7 +192,7 @@ def fixup_activate(filename, old_dir, new_dir):
     with open(filename, 'rb') as f:
         data = f.read().decode('utf-8')
 
-    data = data.replace(old_dir, new_dir)
+    data = data.replace(os.path.basename(old_dir), os.path.basename(new_dir))
     with open(filename, 'wb') as f:
         f.write(data.encode('utf-8'))
 
