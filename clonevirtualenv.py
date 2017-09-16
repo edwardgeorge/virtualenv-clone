@@ -116,7 +116,7 @@ def fix_symlink_if_necessary(src_dir, dst_dir):
 def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
     bin_dir = os.path.join(new_dir, env_bin_dir)
     root, dirs, files = next(os.walk(bin_dir))
-    pybinre = re.compile('pythonw?([0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$')
+    pybinre = re.compile(r'pythonw?([0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$')
     for file_ in files:
         filename = os.path.join(root, file_)
         if file_ in ['python', 'python%s' % version, 'activate_this.py']:
