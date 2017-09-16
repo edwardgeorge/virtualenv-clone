@@ -300,8 +300,8 @@ def main():
     except ValueError:
         print("virtualenv-clone {}".format(__version__))
         parser.error("not enough arguments given.")
-    old_dir = os.path.normpath(os.path.abspath(old_dir))
-    new_dir = os.path.normpath(os.path.abspath(new_dir))
+    old_dir = os.path.realpath(old_dir)
+    new_dir = os.path.realpath(new_dir)
     loglevel = (logging.WARNING, logging.INFO, logging.DEBUG)[min(2,
             options.verbose)]
     logging.basicConfig(level=loglevel, format='%(message)s')
