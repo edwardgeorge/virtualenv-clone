@@ -5,6 +5,21 @@ import clonevirtualenv
 import sys
 from tests import venv_path, clone_path, versions, clean
 
+
+def start_version_test():
+    ran_once = False
+    for version in versions:
+        # create a virtualenv
+        if subprocess.call(['virtualenv', '-p', 'python' + version,
+                            venv_path]) != 0:
+            continue
+
+        ran_once = True
+        yield version
+
+    assert ran_once, "All versions were skipped."
+
+
 class TestVirtualenvSys(TestCase):
 
     def setUp(self):
@@ -17,11 +32,7 @@ class TestVirtualenvSys(TestCase):
 
     def test_virtualenv_versions(self):
         """Verify version for created virtualenvs"""
-        for version in versions:
-            # create a virtualenv
-            assert subprocess.call(['virtualenv', '-p', 'python' + version,
-                    venv_path]) == 0, "Error running virtualenv"
-
+        for version in start_version_test():
             venv_version = clonevirtualenv._virtualenv_sys(venv_path)[0]
             assert version == venv_version, 'Expected version %s' % version
 
@@ -30,11 +41,7 @@ class TestVirtualenvSys(TestCase):
 
     def test_virtualenv_syspath(self):
         """Verify syspath for created virtualenvs"""
-        for version in versions:
-            # create a virtualenv
-            assert subprocess.call(['virtualenv', '-p', 'python' + version,
-                    venv_path]) == 0, "Error running virtualenv"
-
+        for version in start_version_test():
             sys_path = clonevirtualenv._virtualenv_sys(venv_path)[1]
 
             paths = [path for path in sys_path]
@@ -45,11 +52,7 @@ class TestVirtualenvSys(TestCase):
 
     def test_clone_version(self):
         """Verify version for cloned virtualenvs"""
-        for version in versions:
-            # create a virtualenv
-            assert subprocess.call(['virtualenv', '-p', 'python' + version,
-                    venv_path]) == 0, "Error running virtualenv"
-
+        for version in start_version_test():
             # run virtualenv-clone
             sys.argv = ['virtualenv-clone', venv_path, clone_path]
             clonevirtualenv.main()
@@ -66,11 +69,7 @@ class TestVirtualenvSys(TestCase):
 
         This really is a test for fixup_syspath as well
         """
-        for version in versions:
-            # create a virtualenv
-            assert subprocess.call(['virtualenv', '-p', 'python' + version,
-                    venv_path]) == 0, "Error running virtualenv"
-
+        for version in start_version_test():
             # run virtualenv-clone
             sys.argv = ['virtualenv-clone', venv_path, clone_path]
             clonevirtualenv.main()
