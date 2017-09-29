@@ -2,6 +2,9 @@ from tests import venv_path, clone_path, TestBase, tmplocation
 import os
 import clonevirtualenv
 import sys
+import time
+import stat
+
 """
 Fixup scripts meerly just walks bin dir and calls to
 fixup_link, fixup_activate, fixup_script_
@@ -187,3 +190,28 @@ if __name__ == '__main__':
         assert clone_path in data
 
         assert clone_path + '/bin/python2' in data
+
+    def test_fixup_pth_file(self):
+        '''Prior to version 0.2.7, the method fixup_pth_file() wrongly wrote unicode files'''
+
+        content = os.linesep.join(('/usr/local/bin/someFile', '/tmp/xyzzy', '/usr/local/someOtherFile', ''))
+        pth = '/tmp/test_fixup_pth_file.pth'
+
+        with open(pth, 'w') as fd:
+            fd.write(content)
+
+        # Find size of file - should be plain ASCII/UTF-8...
+
+        orgStat = os.stat(pth)
+        assert len(content) == orgStat[stat.ST_SIZE]
+
+        # Now sleep for 2 seconds, then call fixup_pth_file(). This should ensure that the stat.ST_MTIME has
+        # changed if the file has been changed/rewritten
+
+        time.sleep(2)
+        clonevirtualenv.fixup_pth_file(pth, '/usr/local', '/usr/xyzzy')
+        newStat = os.stat(pth)
+        assert orgStat[stat.ST_MTIME] != newStat[stat.ST_MTIME]  # File should have changed
+        assert orgStat[stat.ST_SIZE] == newStat[stat.ST_SIZE]  # Substituting local->xyzzy - size should be the same
+
+        os.remove(pth)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import with_statement
+
 import logging
 import optparse
 import os
@@ -10,7 +11,7 @@ import subprocess
 import sys
 import itertools
 
-version_info = (0, 2, 6)
+version_info = (0, 2, 7)
 __version__ = '.'.join(map(str, version_info))
 
 
@@ -108,7 +109,7 @@ def fix_symlink_if_necessary(src_dir, dst_dir):
                 target = os.path.realpath(full_file_path)
                 if target.startswith(src_dir):
                     new_target = target.replace(src_dir, dst_dir)
-                    logger.debug('fixing symlink in {}'.format(full_file_path))
+                    logger.debug('fixing symlink in %s' % full_file_path)
                     os.remove(full_file_path)
                     os.symlink(new_target, full_file_path)
 
@@ -259,20 +260,26 @@ def fixup_syspath_items(syspath, old_dir, new_dir):
 
 
 def fixup_pth_file(filename, old_dir, new_dir):
-    logger.debug('fixing %s' % filename)
-    with open(filename, 'rb') as f:
+    logger.debug('fixup_pth_file %s' % filename)
+
+    with open(filename, 'r') as f:
         lines = f.readlines()
+
     has_change = False
+
     for num, line in enumerate(lines):
-        line = line.decode('utf-8').strip()
+        line = (line.decode('utf-8') if hasattr(line, 'decode') else line).strip()
+
         if not line or line.startswith('#') or line.startswith('import '):
             continue
         elif _dirmatch(line, old_dir):
             lines[num] = line.replace(old_dir, new_dir, 1)
             has_change = True
+
     if has_change:
-        with open(filename, 'wb') as f:
-            f.writelines(lines)
+        with open(filename, 'w') as f:
+            payload = os.linesep.join([l.strip() for l in lines]) + os.linesep
+            f.write(payload)
 
 
 def fixup_egglink_file(filename, old_dir, new_dir):
@@ -298,7 +305,7 @@ def main():
     try:
         old_dir, new_dir = args
     except ValueError:
-        print("virtualenv-clone {}".format(__version__))
+        print("virtualenv-clone %s" % __version__)
         parser.error("not enough arguments given.")
     old_dir = os.path.realpath(old_dir)
     new_dir = os.path.realpath(new_dir)
