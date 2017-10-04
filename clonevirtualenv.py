@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import with_statement
+
 import logging
 import optparse
 import os
@@ -259,20 +260,26 @@ def fixup_syspath_items(syspath, old_dir, new_dir):
 
 
 def fixup_pth_file(filename, old_dir, new_dir):
-    logger.debug('fixing %s' % filename)
-    with open(filename, 'rb') as f:
+    logger.debug('fixup_pth_file %s' % filename)
+
+    with open(filename, 'r') as f:
         lines = f.readlines()
+
     has_change = False
+
     for num, line in enumerate(lines):
-        line = line.decode('utf-8').strip()
+        line = (line.decode('utf-8') if hasattr(line, 'decode') else line).strip()
+
         if not line or line.startswith('#') or line.startswith('import '):
             continue
         elif _dirmatch(line, old_dir):
             lines[num] = line.replace(old_dir, new_dir, 1)
             has_change = True
+
     if has_change:
-        with open(filename, 'wb') as f:
-            f.writelines(lines)
+        with open(filename, 'w') as f:
+            payload = os.linesep.join([l.strip() for l in lines]) + os.linesep
+            f.write(payload)
 
 
 def fixup_egglink_file(filename, old_dir, new_dir):
