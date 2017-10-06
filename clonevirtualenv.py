@@ -108,7 +108,7 @@ def fix_symlink_if_necessary(src_dir, dst_dir):
                 target = os.path.realpath(full_file_path)
                 if target.startswith(src_dir):
                     new_target = target.replace(src_dir, dst_dir)
-                    logger.debug('fixing symlink in {}'.format(full_file_path))
+                    logger.debug('fixing symlink in %s' % (full_file_path,))
                     os.remove(full_file_path)
                     os.symlink(new_target, full_file_path)
 
@@ -298,7 +298,7 @@ def main():
     try:
         old_dir, new_dir = args
     except ValueError:
-        print("virtualenv-clone {}".format(__version__))
+        print("virtualenv-clone %s" % (__version__,))
         parser.error("not enough arguments given.")
     old_dir = os.path.realpath(old_dir)
     new_dir = os.path.realpath(new_dir)
