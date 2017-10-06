@@ -202,16 +202,16 @@ if __name__ == '__main__':
 
         # Find size of file - should be plain ASCII/UTF-8...
 
-        orgStat = os.stat(pth)
-        assert len(content) == orgStat[stat.ST_SIZE]
+        org_stat = os.stat(pth)
+        assert len(content) == org_stat[stat.ST_SIZE]
 
         # Now sleep for 2 seconds, then call fixup_pth_file(). This should ensure that the stat.ST_MTIME has
         # changed if the file has been changed/rewritten
 
         time.sleep(2)
         clonevirtualenv.fixup_pth_file(pth, '/usr/local', '/usr/xyzzy')
-        newStat = os.stat(pth)
-        assert orgStat[stat.ST_MTIME] != newStat[stat.ST_MTIME]  # File should have changed
-        assert orgStat[stat.ST_SIZE] == newStat[stat.ST_SIZE]  # Substituting local->xyzzy - size should be the same
+        new_stat = os.stat(pth)
+        assert org_stat[stat.ST_MTIME] != new_stat[stat.ST_MTIME]  # File should have changed
+        assert org_stat[stat.ST_SIZE] == new_stat[stat.ST_SIZE]  # Substituting local->xyzzy - size should be the same
 
         os.remove(pth)
