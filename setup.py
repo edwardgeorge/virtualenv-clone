@@ -25,7 +25,7 @@ class ToxTest(TestCommand):
 
 
 setup(name="virtualenv-clone",
-    version='0.2.6',
+    version='0.3.0',
     description='script to clone virtualenvs.',
     author='Edward George',
     author_email='edwardgeorge@gmail.com',
@@ -43,7 +43,10 @@ setup(name="virtualenv-clone",
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
     ],
     tests_require=test_requirements,
     cmdclass={'test': ToxTest}
