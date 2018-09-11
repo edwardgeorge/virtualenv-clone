@@ -24,7 +24,7 @@ class ToxTest(TestCommand):
         tox.cmdline()
 
 
-setup(name="virtualenv-clone",
+setup(name="virtualenv-clone-cura",
     version='0.3.0',
     description='script to clone virtualenvs.',
     author='Edward George',
@@ -34,7 +34,7 @@ setup(name="virtualenv-clone",
     py_modules=["clonevirtualenv"],
     entry_points={
         'console_scripts': [
-            'virtualenv-clone=clonevirtualenv:main',
+            'virtualenv-clone-cura=clonevirtualenv:main',
     ]},
     classifiers=[
         "License :: OSI Approved :: MIT License",
