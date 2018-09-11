@@ -311,7 +311,7 @@ def main():
             old_dir, new_dir = args
             ignore_patterns = None
         except ValueError:
-            print("virtualenv-clone-cura %s" % (__version__,))
+            print("virtualenv-clone %s" % (__version__,))
             parser.error("not enough arguments given.")
     old_dir = os.path.realpath(old_dir)
     new_dir = os.path.realpath(new_dir)
