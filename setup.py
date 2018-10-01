@@ -6,6 +6,10 @@ from setuptools import setup
 if __name__ == '__main__' and sys.version_info < (2, 5):
     raise SystemExit("Python >= 2.5 required for virtualenv-clone")
 
+with open('README.md') as f:
+    long_description = f.read()
+
+
 test_requirements = [
     'virtualenv',
     'tox',
@@ -27,9 +31,11 @@ class ToxTest(TestCommand):
 setup(name="virtualenv-clone",
     version='0.3.0',
     description='script to clone virtualenvs.',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     author='Edward George',
     author_email='edwardgeorge@gmail.com',
-    url='http://github.com/edwardgeorge/virtualenv-clone',
+    url='https://github.com/edwardgeorge/virtualenv-clone',
     license="MIT",
     py_modules=["clonevirtualenv"],
     entry_points={
