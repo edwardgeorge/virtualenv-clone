@@ -18,8 +18,8 @@ It performs the following:
 - copies `sys.argv[1]` dir to `sys.argv[2]`
 - updates the hardcoded `VIRTUAL_ENV` variable in the activate script to the
   new repo location. (`--relocatable` doesn't touch this)
-- updates the shebangs of the various scripts in bin to the new python if
-  they pointed to the old python. (version numbering is retained.)
+- updates the shebangs of the various scripts in bin to the new Python if
+  they pointed to the old Python. (version numbering is retained.)
 
     it can also change `/usr/bin/env python` shebangs to be absolute too,
     though this functionality is not exposed at present.
