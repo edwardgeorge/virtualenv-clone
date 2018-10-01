@@ -18,10 +18,6 @@ __version__ = '.'.join(map(str, version_info))
 logger = logging.getLogger()
 
 
-if sys.version_info < (2, 6):
-    next = lambda gen: gen.next()
-
-
 env_bin_dir = 'bin'
 if sys.platform == 'win32':
     env_bin_dir = 'Scripts'

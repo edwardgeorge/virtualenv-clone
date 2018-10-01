@@ -3,8 +3,8 @@ from setuptools.command.test import test as TestCommand
 from setuptools import setup
 
 
-if __name__ == '__main__' and sys.version_info < (2, 5):
-    raise SystemExit("Python >= 2.5 required for virtualenv-clone")
+if __name__ == '__main__' and sys.version_info < (2, 7):
+    raise SystemExit("Python >= 2.7 required for virtualenv-clone")
 
 test_requirements = [
     'virtualenv',
@@ -36,14 +36,15 @@ setup(name="virtualenv-clone",
         'console_scripts': [
             'virtualenv-clone=clonevirtualenv:main',
     ]},
-    classifiers=[
+      python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+      classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Intended Audience :: Developers",
         "Development Status :: 3 - Alpha",
-        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
