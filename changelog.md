@@ -1,5 +1,10 @@
 # Changelog
 
+## version 0.4.0
+
+- Dropped support for EOL Python versions that no longer
+  receive any updates from the core CPython team.
+
 ## version 0.3.0
 
 - Added support for Python 3.
