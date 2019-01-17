@@ -29,7 +29,7 @@ class ToxTest(TestCommand):
 
 
 setup(name="virtualenv-clone",
-    version='0.4.0',
+    version='0.5.0',
     description='script to clone virtualenvs.',
     long_description=long_description,
     long_description_content_type='text/markdown',
