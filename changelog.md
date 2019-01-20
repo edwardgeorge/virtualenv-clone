@@ -1,5 +1,8 @@
 # Changelog
 
+## version 0.5.1
+- Fixed incorrect Python __version__ value.
+
 ## version 0.5.0
 
 - Added support for Python 3.7.
