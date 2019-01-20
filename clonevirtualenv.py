@@ -11,8 +11,7 @@ import subprocess
 import sys
 import itertools
 
-version_info = (0, 2, 6)
-__version__ = '.'.join(map(str, version_info))
+__version__ = '0.5.1'
 
 
 logger = logging.getLogger()
