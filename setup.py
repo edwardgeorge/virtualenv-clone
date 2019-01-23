@@ -1,6 +1,7 @@
 import sys
 from setuptools.command.test import test as TestCommand
 from setuptools import setup
+import clonevirtualenv
 
 
 if __name__ == '__main__' and sys.version_info < (2, 7):
@@ -29,7 +30,7 @@ class ToxTest(TestCommand):
 
 
 setup(name="virtualenv-clone",
-    version='0.5.1',
+    version=clonevirtualenv.__version__,
     description='script to clone virtualenvs.',
     long_description=long_description,
     long_description_content_type='text/markdown',
