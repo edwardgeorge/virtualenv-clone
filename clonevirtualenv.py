@@ -61,7 +61,7 @@ def _virtualenv_sys(venv_path):
     stdout, err = p.communicate()
     assert not p.returncode and stdout
     lines = stdout.decode('utf-8').splitlines()
-    return lines[0], filter(bool, lines[1:])
+    return lines[0], list(filter(bool, lines[1:]))
 
 
 def clone_virtualenv(src_dir, dst_dir):

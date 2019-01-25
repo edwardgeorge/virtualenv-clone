@@ -75,6 +75,7 @@ class TestVirtualenvSys(TestCase):
             clonevirtualenv.main()
 
             sys_path = clonevirtualenv._virtualenv_sys(clone_path)[1]
+            assert isinstance(sys_path, list), "Path information needs to be a list"
 
             paths = [path for path in sys_path]
             assert paths, "There should be path information"
