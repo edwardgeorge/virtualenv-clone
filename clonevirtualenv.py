@@ -11,8 +11,6 @@ import subprocess
 import sys
 import itertools
 
-__version__ = '0.5.1'
-
 
 logger = logging.getLogger()
 
@@ -300,7 +298,6 @@ def main():
     try:
         old_dir, new_dir = args
     except ValueError:
-        print("virtualenv-clone %s" % (__version__,))
         parser.error("not enough arguments given.")
     old_dir = os.path.realpath(old_dir)
     new_dir = os.path.realpath(new_dir)
