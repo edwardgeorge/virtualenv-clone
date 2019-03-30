@@ -1,6 +1,11 @@
 # Changelog
 
+## version 0.5.2
+
+- Fixed minor Python3 typing issue.
+
 ## version 0.5.1
+
 - Fixed incorrect Python __version__ value.
 
 ## version 0.5.0
