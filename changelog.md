@@ -1,5 +1,9 @@
 # Changelog
 
+## version 0.5.3
+
+- Fixed a minor bug in the package MANIFEST file.
+
 ## version 0.5.2
 
 - Fixed minor Python3 typing issue.
