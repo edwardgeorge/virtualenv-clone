@@ -197,9 +197,14 @@ def fixup_activate(filename, old_dir, new_dir):
     with open(filename, 'rb') as f:
         data = f.read().decode('utf-8')
 
-    data = data.replace(old_dir, new_dir)
+    # search/replace the directory path in the activate script
+    new_data = data.replace(old_dir, new_dir)
+    if new_data == data:
+        raise UserError("The activate script did not contain the "
+                        "old directory {0}".format(old_dir))
+
     with open(filename, 'wb') as f:
-        f.write(data.encode('utf-8'))
+        f.write(new_data.encode('utf-8'))
 
 
 def fixup_link(filename, old_dir, new_dir, target=None):
