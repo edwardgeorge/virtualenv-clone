@@ -1,5 +1,9 @@
 # Changelog
 
+## version 0.5.4
+
+- Added support for Python 3.8.
+
 ## version 0.5.3
 
 - Fixed a minor bug in the package MANIFEST file.
@@ -26,5 +30,3 @@
 - Added support for Python 3.
 - Fixed a bug with writing unicode in .pth files incorrectly.
 - Fixed support for paths involving symbolic links.
-
-
