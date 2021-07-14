@@ -8,7 +8,7 @@ from unittest import TestCase
 tmplocation = tempfile.mkdtemp()
 venv_path = os.path.realpath(os.path.join(tmplocation,'srs_venv'))
 clone_path = os.path.realpath(os.path.join(tmplocation,'clone_venv'))
-versions = ['2.7', '3.4', '3.5', '3.6', '3.7', '3.8']
+versions = ['2.7', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9']
 
 def clean():
     if os.path.exists(tmplocation): shutil.rmtree(tmplocation)
