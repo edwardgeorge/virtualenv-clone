@@ -1,5 +1,9 @@
 # Changelog
 
+## version 0.5.5
+
+- Added support for Python 3.9.
+
 ## version 0.5.4
 
 - Added support for Python 3.8.
