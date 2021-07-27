@@ -57,6 +57,7 @@ setup(name="virtualenv-clone",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     tests_require=test_requirements,
     cmdclass={'test': ToxTest}
