@@ -54,7 +54,7 @@ def _virtualenv_sys(venv_path):
     # keyword argument "executable" to get correct value from sys.path
     p = subprocess.Popen([executable,
         '-c', 'import sys;'
-              'print (sys.version[:3]);'
+              'print ("%d.%d" % (sys.version_info.major, sys.version_info.minor));'
               'print ("\\n".join(sys.path));'],
         env={},
         stdout=subprocess.PIPE)
