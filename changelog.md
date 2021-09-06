@@ -1,5 +1,9 @@
 # Changelog
 
+## version 0.5.7
+
+- Added tox.ini to source distributions.
+
 ## version 0.5.6
 
 - Added support for Python 3.10.
