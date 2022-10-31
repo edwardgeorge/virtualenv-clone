@@ -1,8 +1,18 @@
 virtualenv cloning script.
 
+
 [![Build Status](https://travis-ci.org/edwardgeorge/virtualenv-clone.svg?branch=master)](https://travis-ci.org/edwardgeorge/virtualenv-clone)
 
 A script for cloning a non-relocatable virtualenv.
+
+
+```
+
+python -m clonevirtualenv /path/to/ /path/to/venv
+
+e.G. python -m clonevirtualenv /opt/miniconda3/ ./venv
+```
+Clones the python installation into a virtual enviroment in the current derectory
 
 Virtualenv provides a way to make virtualenv's relocatable which could then be
 copied as we wanted. However making a virtualenv relocatable this way breaks
