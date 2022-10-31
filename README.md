@@ -1,8 +1,16 @@
 virtualenv cloning script.
 
+
 [![Build Status](https://travis-ci.org/edwardgeorge/virtualenv-clone.svg?branch=master)](https://travis-ci.org/edwardgeorge/virtualenv-clone)
 
 A script for cloning a non-relocatable virtualenv.
+
+
+```
+
+python -m clonevirtualenv /path/to/ /path/to/venv
+
+```
 
 Virtualenv provides a way to make virtualenv's relocatable which could then be
 copied as we wanted. However making a virtualenv relocatable this way breaks
@@ -31,5 +39,7 @@ It performs the following:
 
 - finally it double checks `sys.path` again and will fail if there are still
   paths from the old environment present.
+
+This script clones virtual enviroments, it does not clone your python installation into a virtual environment. 
 
 NOTE: This script requires Python 2.7 or 3.4+
