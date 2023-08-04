@@ -50,13 +50,17 @@ def _dirmatch(path, matchwith):
 def _virtualenv_sys(venv_path):
     "obtain version and path info from a virtualenv."
     executable = os.path.join(venv_path, env_bin_dir, 'python')
+    env = {}
+    if sys.platform == 'win32':
+        executable = os.path.join(venv_path, env_bin_dir, 'python.EXE')
+        env = { "PATH": os.environ["PATH"] }
     # Must use "executable" as the first argument rather than as the
     # keyword argument "executable" to get correct value from sys.path
     p = subprocess.Popen([executable,
         '-c', 'import sys;'
               'print ("%d.%d" % (sys.version_info.major, sys.version_info.minor));'
               'print ("\\n".join(sys.path));'],
-        env={},
+        env=env,
         stdout=subprocess.PIPE)
     stdout, err = p.communicate()
     assert not p.returncode and stdout
