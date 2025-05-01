@@ -54,6 +54,7 @@ class TestVirtualenvClone(TestBase):
                 if file_.endswith('.pyc') or\
                     file_.endswith('.exe') or\
                     file_.endswith('.egg') or\
+                    file_.endswith('.zip') or\
                     file_ in ['python', 'python%s' % version]:
                     # binarys fail reading and
                     # compiled will be recompiled
