@@ -64,7 +64,7 @@ def _virtualenv_sys(venv_path):
     return lines[0], list(filter(bool, lines[1:]))
 
 
-def clone_virtualenv(src_dir, dst_dir):
+def clone_virtualenv(src_dir, dst_dir, ignore_patterns=None):
     if not os.path.exists(src_dir):
         raise UserError('src dir %r does not exist' % src_dir)
     if os.path.exists(dst_dir):
@@ -72,8 +72,10 @@ def clone_virtualenv(src_dir, dst_dir):
     #sys_path = _virtualenv_syspath(src_dir)
     logger.info('cloning virtualenv \'%s\' => \'%s\'...' %
             (src_dir, dst_dir))
+    if '*.pyc' not in ignore_patterns:
+        ignore_patterns += ',*.pyc' 
     shutil.copytree(src_dir, dst_dir, symlinks=True,
-            ignore=shutil.ignore_patterns('*.pyc'))
+            ignore=shutil.ignore_patterns(*ignore_patterns.split(',')))
     version, sys_path = _virtualenv_sys(dst_dir)
     logger.info('fixing scripts in bin...')
     fixup_scripts(src_dir, dst_dir, version)
@@ -290,7 +292,7 @@ def fixup_egglink_file(filename, old_dir, new_dir):
 
 def main():
     parser = optparse.OptionParser("usage: %prog [options]"
-        " /path/to/existing/venv /path/to/cloned/venv")
+        " /path/to/existing/venv /path/to/cloned/venv [ignore_patterns]")
     parser.add_option('-v',
             action="count",
             dest='verbose',
@@ -298,17 +300,21 @@ def main():
             help='verbosity')
     options, args = parser.parse_args()
     try:
-        old_dir, new_dir = args
+        old_dir, new_dir, ignore_patterns = args
     except ValueError:
-        print("virtualenv-clone %s" % (__version__,))
-        parser.error("not enough arguments given.")
+        try:
+            old_dir, new_dir = args
+            ignore_patterns = None
+        except ValueError:
+            print("virtualenv-clone %s" % (__version__,))
+            parser.error("not enough arguments given.")
     old_dir = os.path.realpath(old_dir)
     new_dir = os.path.realpath(new_dir)
     loglevel = (logging.WARNING, logging.INFO, logging.DEBUG)[min(2,
             options.verbose)]
     logging.basicConfig(level=loglevel, format='%(message)s')
     try:
-        clone_virtualenv(old_dir, new_dir)
+        clone_virtualenv(old_dir, new_dir, ignore_patterns)
     except UserError:
         e = sys.exc_info()[1]
         parser.error(str(e))
