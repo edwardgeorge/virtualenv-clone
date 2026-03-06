@@ -77,6 +77,7 @@ def clone_virtualenv(src_dir, dst_dir):
     version, sys_path = _virtualenv_sys(dst_dir)
     logger.info('fixing scripts in bin...')
     fixup_scripts(src_dir, dst_dir, version)
+    fixup_pyvenv_cfg(src_dir, dst_dir)
 
     has_old = lambda s: any(i for i in s if _dirmatch(i, src_dir))
 
@@ -130,6 +131,23 @@ def fixup_scripts(old_dir, new_dir, version, rewrite_env_python=False):
         elif os.path.isfile(filename):
             fixup_script_(root, file_, old_dir, new_dir, version,
                 rewrite_env_python=rewrite_env_python)
+
+
+def fixup_pyvenv_cfg(old_dir, new_dir):
+    filename = os.path.join(new_dir, 'pyvenv.cfg')
+    if not os.path.exists(filename):
+        return
+    with open(filename, 'rb') as f:
+        original = f.read()
+    replaced = original.replace(
+        old_dir.encode('utf-8'),
+        new_dir.encode('utf-8')
+    )
+    if original == replaced:
+        return
+    logger.info('fixing pyvenv.cfg...')
+    with open(filename, 'wb') as f:
+        f.write(replaced)
 
 
 def fixup_script_(root, file_, old_dir, new_dir, version,
